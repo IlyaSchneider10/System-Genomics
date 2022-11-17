@@ -12,17 +12,16 @@ library(BiocManager)
 library(biomaRt)
 library(ggplot2)
 library(cowplot)
+library(here)
 ```
 
 # 3_2 Import data to R
 
 ```{r}
-#Read in gene.result files
-setwd("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/EulerDownload/")
-samples <- list.files("rsem")
+samples <- list.files(here("EulerDownload","rsem"))
 
 expr <- sapply(samples, function(sample){
-  file <- paste0("rsem/",sample,"/",sample,".genes.results")
+  file <- paste0(here("EulerDownload","rsem"),"/",sample,"/",sample,".genes.results")
   quant <- read.csv(file, sep="\t", header=T)
   tpm <- setNames(quant$TPM, quant$gene_id)
   return(tpm)
@@ -30,18 +29,14 @@ expr <- sapply(samples, function(sample){
 
 ```
 
+#Read in metadata
 ```{r}
-
-#read in metadata
-#meta1 <-read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/SRA data retrieval/SraRunTable.txt", header=T)
-
-meta <- read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/Paper/additional_meta.csv", header=T) %>%
-  inner_join(read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/SRA data retrieval/SraRunTable.txt", header=T),
+meta <- read.csv(here("additional_meta.csv"), header=T) %>%
+  inner_join(read.csv(here("SraRunTable.txt"), header=T),
              by ="GEO_Accession..exp.",
              suffix = c("",".y"))
 meta$X <- NULL
 expr <- expr[,meta$Run]
-
 ```
 
 ```{r}
