@@ -1,0 +1,288 @@
+start to process sample SRR1047863
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047863_1.fastq rawdata/SRR1047863_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047863/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 11 15:40:10 ..... started STAR run
+Nov 11 15:40:10 ..... loading genome
+Nov 11 15:40:33 ..... processing annotations GTF
+Nov 11 15:40:45 ..... inserting junctions into the genome indices
+Nov 11 15:45:05 ..... started mapping
+Nov 11 16:35:21 ..... finished mapping
+Nov 11 16:35:29 ..... started sorting BAM
+Nov 11 17:14:56 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047863/SRR1047863.temp/SRR1047863 rsem/SRR1047863/SRR1047863.stat/SRR1047863 mapping_transcriptome/SRR1047863/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047863/SRR1047863.temp/SRR1047863_alignable_1.fq rsem/SRR1047863/SRR1047863.temp/SRR1047863_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047863/SRR1047863 rsem/SRR1047863/SRR1047863.temp/SRR1047863 rsem/SRR1047863/SRR1047863.stat/SRR1047863 -p 10 -b mapping_transcriptome/SRR1047863/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 37 m 02 s
+
+rm -rf rsem/SRR1047863/SRR1047863.temp
+
+  rsem done
+start to process sample SRR1047864
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047864_1.fastq rawdata/SRR1047864_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047864/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 11 19:26:30 ..... started STAR run
+Nov 11 19:26:30 ..... loading genome
+Nov 11 19:26:52 ..... processing annotations GTF
+Nov 11 19:27:05 ..... inserting junctions into the genome indices
+Nov 11 19:31:19 ..... started mapping
+Nov 11 19:59:47 ..... finished mapping
+Nov 11 19:59:53 ..... started sorting BAM
+Nov 11 20:21:05 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047864/SRR1047864.temp/SRR1047864 rsem/SRR1047864/SRR1047864.stat/SRR1047864 mapping_transcriptome/SRR1047864/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047864/SRR1047864.temp/SRR1047864_alignable_1.fq rsem/SRR1047864/SRR1047864.temp/SRR1047864_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047864/SRR1047864 rsem/SRR1047864/SRR1047864.temp/SRR1047864 rsem/SRR1047864/SRR1047864.stat/SRR1047864 -p 10 -b mapping_transcriptome/SRR1047864/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 21 m 59 s
+
+rm -rf rsem/SRR1047864/SRR1047864.temp
+
+  rsem done
+start to process sample SRR1047865
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047865_1.fastq rawdata/SRR1047865_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047865/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 11 22:07:55 ..... started STAR run
+Nov 11 22:07:55 ..... loading genome
+Nov 11 22:08:20 ..... processing annotations GTF
+Nov 11 22:08:32 ..... inserting junctions into the genome indices
+Nov 11 22:12:36 ..... started mapping
+Nov 11 22:48:29 ..... finished mapping
+Nov 11 22:48:34 ..... started sorting BAM
+Nov 11 23:21:17 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047865/SRR1047865.temp/SRR1047865 rsem/SRR1047865/SRR1047865.stat/SRR1047865 mapping_transcriptome/SRR1047865/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047865/SRR1047865.temp/SRR1047865_alignable_1.fq rsem/SRR1047865/SRR1047865.temp/SRR1047865_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047865/SRR1047865 rsem/SRR1047865/SRR1047865.temp/SRR1047865 rsem/SRR1047865/SRR1047865.stat/SRR1047865 -p 10 -b mapping_transcriptome/SRR1047865/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 40 m 50 s
+
+rm -rf rsem/SRR1047865/SRR1047865.temp
+
+  rsem done
+start to process sample SRR1047866
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047866_1.fastq rawdata/SRR1047866_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047866/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 01:33:13 ..... started STAR run
+Nov 12 01:33:13 ..... loading genome
+Nov 12 01:34:01 ..... processing annotations GTF
+Nov 12 01:34:16 ..... inserting junctions into the genome indices
+Nov 12 01:38:23 ..... started mapping
+Nov 12 02:10:35 ..... finished mapping
+Nov 12 02:10:40 ..... started sorting BAM
+Nov 12 02:44:43 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047866/SRR1047866.temp/SRR1047866 rsem/SRR1047866/SRR1047866.stat/SRR1047866 mapping_transcriptome/SRR1047866/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047866/SRR1047866.temp/SRR1047866_alignable_1.fq rsem/SRR1047866/SRR1047866.temp/SRR1047866_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047866/SRR1047866 rsem/SRR1047866/SRR1047866.temp/SRR1047866 rsem/SRR1047866/SRR1047866.stat/SRR1047866 -p 10 -b mapping_transcriptome/SRR1047866/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 19 m 27 s
+
+rm -rf rsem/SRR1047866/SRR1047866.temp
+
+  rsem done
+start to process sample SRR1047867
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047867_1.fastq rawdata/SRR1047867_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047867/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 04:29:10 ..... started STAR run
+Nov 12 04:29:10 ..... loading genome
+Nov 12 04:29:31 ..... processing annotations GTF
+Nov 12 04:29:43 ..... inserting junctions into the genome indices
+Nov 12 04:33:54 ..... started mapping
+Nov 12 05:07:57 ..... finished mapping
+Nov 12 05:08:04 ..... started sorting BAM
+Nov 12 05:37:13 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047867/SRR1047867.temp/SRR1047867 rsem/SRR1047867/SRR1047867.stat/SRR1047867 mapping_transcriptome/SRR1047867/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047867/SRR1047867.temp/SRR1047867_alignable_1.fq rsem/SRR1047867/SRR1047867.temp/SRR1047867_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047867/SRR1047867 rsem/SRR1047867/SRR1047867.temp/SRR1047867 rsem/SRR1047867/SRR1047867.stat/SRR1047867 -p 10 -b mapping_transcriptome/SRR1047867/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 26 m 43 s
+
+rm -rf rsem/SRR1047867/SRR1047867.temp
+
+  rsem done
+start to process sample SRR1047868
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047868_1.fastq rawdata/SRR1047868_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047868/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 07:29:23 ..... started STAR run
+Nov 12 07:29:23 ..... loading genome
+Nov 12 07:29:45 ..... processing annotations GTF
+Nov 12 07:29:59 ..... inserting junctions into the genome indices
+Nov 12 07:33:56 ..... started mapping
+Nov 12 08:11:06 ..... finished mapping
+Nov 12 08:11:13 ..... started sorting BAM
+Nov 12 08:42:41 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047868/SRR1047868.temp/SRR1047868 rsem/SRR1047868/SRR1047868.stat/SRR1047868 mapping_transcriptome/SRR1047868/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047868/SRR1047868.temp/SRR1047868_alignable_1.fq rsem/SRR1047868/SRR1047868.temp/SRR1047868_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047868/SRR1047868 rsem/SRR1047868/SRR1047868.temp/SRR1047868 rsem/SRR1047868/SRR1047868.stat/SRR1047868 -p 10 -b mapping_transcriptome/SRR1047868/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 50 m 21 s
+
+rm -rf rsem/SRR1047868/SRR1047868.temp
+
+  rsem done
+start to process sample SRR1047869
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047869_1.fastq rawdata/SRR1047869_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047869/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 11:03:40 ..... started STAR run
+Nov 12 11:03:40 ..... loading genome
+Nov 12 11:04:05 ..... processing annotations GTF
+Nov 12 11:04:17 ..... inserting junctions into the genome indices
+Nov 12 11:08:16 ..... started mapping
+Nov 12 11:44:09 ..... finished mapping
+Nov 12 11:44:14 ..... started sorting BAM
+Nov 12 12:17:07 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047869/SRR1047869.temp/SRR1047869 rsem/SRR1047869/SRR1047869.stat/SRR1047869 mapping_transcriptome/SRR1047869/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047869/SRR1047869.temp/SRR1047869_alignable_1.fq rsem/SRR1047869/SRR1047869.temp/SRR1047869_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047869/SRR1047869 rsem/SRR1047869/SRR1047869.temp/SRR1047869 rsem/SRR1047869/SRR1047869.stat/SRR1047869 -p 10 -b mapping_transcriptome/SRR1047869/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 55 m 08 s
+
+rm -rf rsem/SRR1047869/SRR1047869.temp
+
+  rsem done
+start to process sample SRR1047870
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047870_1.fastq rawdata/SRR1047870_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047870/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 14:45:36 ..... started STAR run
+Nov 12 14:45:36 ..... loading genome
+Nov 12 14:46:00 ..... processing annotations GTF
+Nov 12 14:46:14 ..... inserting junctions into the genome indices
+Nov 12 14:50:13 ..... started mapping
+Nov 12 15:23:59 ..... finished mapping
+Nov 12 15:24:06 ..... started sorting BAM
+Nov 12 16:02:39 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047870/SRR1047870.temp/SRR1047870 rsem/SRR1047870/SRR1047870.stat/SRR1047870 mapping_transcriptome/SRR1047870/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047870/SRR1047870.temp/SRR1047870_alignable_1.fq rsem/SRR1047870/SRR1047870.temp/SRR1047870_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047870/SRR1047870 rsem/SRR1047870/SRR1047870.temp/SRR1047870 rsem/SRR1047870/SRR1047870.stat/SRR1047870 -p 10 -b mapping_transcriptome/SRR1047870/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 46 m 01 s
+
+rm -rf rsem/SRR1047870/SRR1047870.temp
+
+  rsem done
+start to process sample SRR1047871
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047871_1.fastq rawdata/SRR1047871_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047871/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 18:18:01 ..... started STAR run
+Nov 12 18:18:01 ..... loading genome
+Nov 12 18:18:26 ..... processing annotations GTF
+Nov 12 18:18:40 ..... inserting junctions into the genome indices
+Nov 12 18:22:37 ..... started mapping
+Nov 12 18:54:19 ..... finished mapping
+Nov 12 18:54:26 ..... started sorting BAM
+Nov 12 19:20:53 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047871/SRR1047871.temp/SRR1047871 rsem/SRR1047871/SRR1047871.stat/SRR1047871 mapping_transcriptome/SRR1047871/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047871/SRR1047871.temp/SRR1047871_alignable_1.fq rsem/SRR1047871/SRR1047871.temp/SRR1047871_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047871/SRR1047871 rsem/SRR1047871/SRR1047871.temp/SRR1047871 rsem/SRR1047871/SRR1047871.stat/SRR1047871 -p 10 -b mapping_transcriptome/SRR1047871/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 49 m 14 s
+
+rm -rf rsem/SRR1047871/SRR1047871.temp
+
+  rsem done
+start to process sample SRR1047872
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047872_1.fastq rawdata/SRR1047872_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047872/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 12 21:40:52 ..... started STAR run
+Nov 12 21:40:52 ..... loading genome
+Nov 12 21:41:17 ..... processing annotations GTF
+Nov 12 21:41:31 ..... inserting junctions into the genome indices
+Nov 12 21:45:21 ..... started mapping
+Nov 12 22:18:11 ..... finished mapping
+Nov 12 22:18:18 ..... started sorting BAM
+Nov 12 22:46:59 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047872/SRR1047872.temp/SRR1047872 rsem/SRR1047872/SRR1047872.stat/SRR1047872 mapping_transcriptome/SRR1047872/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047872/SRR1047872.temp/SRR1047872_alignable_1.fq rsem/SRR1047872/SRR1047872.temp/SRR1047872_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047872/SRR1047872 rsem/SRR1047872/SRR1047872.temp/SRR1047872 rsem/SRR1047872/SRR1047872.stat/SRR1047872 -p 10 -b mapping_transcriptome/SRR1047872/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 49 m 36 s
+
+rm -rf rsem/SRR1047872/SRR1047872.temp
+
+  rsem done
+start to process sample SRR1047873
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047873_1.fastq rawdata/SRR1047873_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047873/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 13 01:07:44 ..... started STAR run
+Nov 13 01:07:44 ..... loading genome
+Nov 13 01:08:03 ..... processing annotations GTF
+Nov 13 01:08:15 ..... inserting junctions into the genome indices
+Nov 13 01:12:17 ..... started mapping
+Nov 13 01:40:38 ..... finished mapping
+Nov 13 01:40:44 ..... started sorting BAM
+Nov 13 02:04:48 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047873/SRR1047873.temp/SRR1047873 rsem/SRR1047873/SRR1047873.stat/SRR1047873 mapping_transcriptome/SRR1047873/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047873/SRR1047873.temp/SRR1047873_alignable_1.fq rsem/SRR1047873/SRR1047873.temp/SRR1047873_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047873/SRR1047873 rsem/SRR1047873/SRR1047873.temp/SRR1047873 rsem/SRR1047873/SRR1047873.stat/SRR1047873 -p 10 -b mapping_transcriptome/SRR1047873/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 27 m 29 s
+
+rm -rf rsem/SRR1047873/SRR1047873.temp
+
+  rsem done
+start to process sample SRR1047874
+  mapping started
+	STAR --genomeDir genome/star-index --runThreadN 10 --readFilesIn rawdata/SRR1047874_1.fastq rawdata/SRR1047874_2.fastq --sjdbGTFfile genome/gencode.v42.annotation.gtf --quantMode TranscriptomeSAM --outSAMtype BAM SortedByCoordinate --outFileNamePrefix mapping_transcriptome/SRR1047874/ --limitBAMsortRAM 150000000000
+	STAR version: 2.7.10a   compiled: 2022-01-14T18:50:00-05:00 :/home/dobin/data/STAR/STARcode/STAR.master/source
+Nov 13 04:01:01 ..... started STAR run
+Nov 13 04:01:01 ..... loading genome
+Nov 13 04:01:19 ..... processing annotations GTF
+Nov 13 04:01:30 ..... inserting junctions into the genome indices
+Nov 13 04:05:38 ..... started mapping
+Nov 13 04:35:50 ..... finished mapping
+Nov 13 04:35:56 ..... started sorting BAM
+Nov 13 04:53:11 ..... finished successfully
+  mapping done
+rsem started
+rsem-parse-alignments genome/rsem_hg38_gencode42/rsem_hg38_gencode42 rsem/SRR1047874/SRR1047874.temp/SRR1047874 rsem/SRR1047874/SRR1047874.stat/SRR1047874 mapping_transcriptome/SRR1047874/Aligned.toTranscriptome.out.bam 3 -tag XM -q
+
+rsem-build-read-index 32 1 1 rsem/SRR1047874/SRR1047874.temp/SRR1047874_alignable_1.fq rsem/SRR1047874/SRR1047874.temp/SRR1047874_alignable_2.fq
+
+rsem-run-em genome/rsem_hg38_gencode42/rsem_hg38_gencode42 3 rsem/SRR1047874/SRR1047874 rsem/SRR1047874/SRR1047874.temp/SRR1047874 rsem/SRR1047874/SRR1047874.stat/SRR1047874 -p 10 -b mapping_transcriptome/SRR1047874/Aligned.toTranscriptome.out.bam 0 -q
+Time Used for EM.cpp : 1 h 59 m 13 s
+
+rm -rf rsem/SRR1047874/SRR1047874.temp
+
+  rsem done
