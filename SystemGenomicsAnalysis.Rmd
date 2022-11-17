@@ -90,6 +90,6 @@ hist(num_det)
 #mark unexpressed or extremely low expressed genes
 expressed <- rowMeans(expr > 0) >= 0.5 | rowMeans(expr) >= 1
 meta_genes$expressed <- expressed
-
+#test ilja
 ```
 
