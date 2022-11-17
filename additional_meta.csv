@@ -1,0 +1,13 @@
+,Individual,Age,Sex,Race,Smoker,RIN,Cause of death,GEO_Accession..exp.
+,BP6,48,M,CAU,yes,8,Cardiac,GSM1288379
+,BP7,19,F,CAU,no,7.2,Suicide,GSM1288380
+,BP8,42,F,CAU,unknown,6.9,Cardiac,GSM1288381
+,BP9,29,F,CAU,no,7.9,Suicide,GSM1288382
+,BP10,63,M,CAU,unknown,7.2,Suicide,GSM1288383
+,BP11,63,M,CAU,no,8.7,Cardiac,GSM1288384
+,Control6,46,M,CAU,unknown,8.3,Cardiac,GSM1288385
+,Control7,63,M,CAU,unknown,7.7,Cardiac,GSM1288386
+,Control8,57,M,CAU,unknown,8.1,Cardiac,GSM1288387
+,Control3063,27,F,CAU,No,8.1,Homicide,GSM1288388
+,Control4054,41,F,CAU,No,8.6,Natural,GSM1288389
+,Control5841,19,F,CAU,No,7.7,Natural,GSM1288390

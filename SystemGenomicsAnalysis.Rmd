@@ -1,0 +1,100 @@
+---
+title: "SystemGenomicsAnalysis"
+author: "Moritz Ullhofen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(BiocManager)
+library(biomaRt)
+library(ggplot2)
+library(cowplot)
+```
+
+# 3_2 Import data to R
+
+```{r}
+#Read in gene.result files
+setwd("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/EulerDownload/")
+samples <- list.files("rsem")
+
+expr <- sapply(samples, function(sample){
+  file <- paste0("rsem/",sample,"/",sample,".genes.results")
+  quant <- read.csv(file, sep="\t", header=T)
+  tpm <- setNames(quant$TPM, quant$gene_id)
+  return(tpm)
+})
+
+```
+
+```{r}
+
+#read in metadata
+#meta1 <-read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/SRA data retrieval/SraRunTable.txt", header=T)
+
+meta <- read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/Paper/additional_meta.csv", header=T) %>%
+  inner_join(read.csv("/Users/moritzullhofen/Desktop/ETH/AS22/AA_Systems_Genomics/DryLab/SRA data retrieval/SraRunTable.txt", header=T),
+             by ="GEO_Accession..exp.",
+             suffix = c("",".y"))
+meta$X <- NULL
+expr <- expr[,meta$Run]
+
+```
+
+```{r}
+
+expr <- expr[,meta$Run]
+
+#more gene information
+ensembl <- useEnsembl(biomart = "ensembl",
+                      dataset = "hsapiens_gene_ensembl")
+meta_genes <- getBM(attributes = c("ensembl_gene_id",
+                                   "ensembl_gene_id_version",
+                                   "hgnc_symbol",
+                                   "description",
+                                   "chromosome_name",
+                                   "start_position",
+                                   "end_position",
+                                   "strand"),
+                    filters = "ensembl_gene_id_version",
+                    values = rownames(expr),
+                    mart = ensembl) %>%
+  right_join(data.frame(ensembl_gene_id_version = rownames(expr)),
+             by = "ensembl_gene_id_version") %>%
+  distinct(ensembl_gene_id_version, .keep_all = TRUE)
+expr <- expr[meta_genes$ensembl_gene_id_version,]
+
+```
+
+# 3-3 Comparison of transcriptomic profiles across samples
+
+```{r}
+#check dimensions, and average expression level
+dim(expr)
+
+avg_expr <- rowMeans(expr)
+layout(matrix(1:2, nrow=1))
+hist(avg_expr)
+hist(log10(avg_expr + 1))
+
+#log tranform y-axis
+ggplot(data.frame(avg_expr), aes(x=avg_expr)) +
+  geom_histogram(bins = 50) +
+  scale_x_continuous(breaks = c(0,1,10,100,1000,10000,20000), trans="log1p", expand=c(0,0)) +
+  scale_y_continuous(breaks = c(0,1), expand=c(0,0), trans="log1p") +
+  theme_minimal()
+
+#how many samples each gene detected
+num_det <- rowSums(expr > 0)
+hist(num_det)
+```
+```{r}
+#mark unexpressed or extremely low expressed genes
+expressed <- rowMeans(expr > 0) >= 0.5 | rowMeans(expr) >= 1
+meta_genes$expressed <- expressed
+
+```
+
