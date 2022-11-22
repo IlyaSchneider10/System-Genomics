@@ -91,7 +91,31 @@ hist(num_det)
 expressed <- rowMeans(expr > 0) >= 0.5 | rowMeans(expr) >= 1
 meta_genes$expressed <- expressed
 
-#test ilja
-#its ilya murits
+#see the correlation between the genes
+corr_pearson <- cor(log1p(expr[meta_genes$expressed,]))
+corr_spearman <- cor(expr[meta_genes$expressed,], method = "spearman")
+
+#hierarchical clusterring
+hcl_pearson <- hclust(as.dist(1 - corr_pearson))
+hcl_spearman <- hclust(as.dist(1 - corr_spearman))
+
+layout(matrix(1:2,nrow=1))
+plot(hcl_pearson)
+plot(hcl_spearman)
+
+#Example of plotting with different labels in spearman case
+layout(matrix(1:2,nrow=1))
+plot(hcl_spearman, labels = meta$Individual)
+plot(hcl_spearman, labels = meta$Layer)
 ```
+
+
+```{r}
+#Dimension reducted with PCA
+pca <- prcomp(log1p(t(expr[meta_genes$expressed,])), center = TRUE, scale. = TRUE)
+eigs <- pca$sdev^2
+plot(1:length(eigs), eigs)
+
+```
+
 
