@@ -106,12 +106,13 @@ plot(hcl_spearman)
 #Example of plotting with different labels in spearman case
 layout(matrix(1:2,nrow=1))
 plot(hcl_spearman, labels = meta$Individual)
-plot(hcl_spearman, labels = meta$Layer)
+plot(hcl_spearman, labels = meta$Sex) #ma<be choose other variable (disease_state?)
 ```
 
 
 ```{r}
-#Dimension reducted with PCA
+#Dimension reduced with PCA
+#normalize eigenvalues of x 
 pca <- prcomp(log1p(t(expr[meta_genes$expressed,])), center = TRUE, scale. = TRUE)
 eigs <- pca$sdev^2
 plot(1:length(eigs), eigs)
