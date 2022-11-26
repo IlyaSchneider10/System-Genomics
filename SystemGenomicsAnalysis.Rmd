@@ -163,7 +163,7 @@ hcl_spearman_highvar <- hclust(as.dist(1 - corr_spearman_highvar))
 layout(matrix(1:2,nrow=1))
 
 plot(hcl_spearman_highvar, labels = meta$Sex)
-plot(hcl_spearman, labels = meta$disease_state)
+plot(hcl_spearman_highvar, labels = meta$disease_state)
 
 pca_highvar <- prcomp(log1p(t(expr[meta_genes$highvar,])), center = TRUE, scale. = TRUE)
 ggplot(data.frame(pca_highvar$x, meta)) +
@@ -172,17 +172,17 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 
 ```{r}
 #Batch effect correction
-expr_combat<-ComBat_seq(counts=expr,batch=meta$Individual)
+expr_combat<-ComBat_seq(counts=expr,batch=meta$disease_state)
 
-corr_spearman_highvar <- cor(expr_combat[meta_genes$highvar,], method = "spearman")
-hcl_spearman_highvar <- hclust(as.dist(1 - corr_spearman_highvar))
+corr_spearman_combat <- cor(expr_combat[meta_genes$expressed,], method = "spearman")
+hcl_spearman_combat <- hclust(as.dist(1 - corr_spearman_combat))
 layout(matrix(1:2,nrow=1))
 
-plot(hcl_spearman_highvar, labels = meta$Sex)
-plot(hcl_spearman, labels = meta$disease_state)
+plot(hcl_spearman_combat, labels = meta$Sex)
+plot(hcl_spearman_combat, labels = meta$disease_state)
 
-pca_highvar <- prcomp(log1p(t(expr_combat[meta_genes$highvar,])), center = TRUE, scale. = TRUE)
-ggplot(data.frame(pca_highvar$x, meta)) +
+pca_combat <- prcomp(log1p(t(expr_combat[meta_genes$expressed,])), center = TRUE, scale. = TRUE)
+ggplot(data.frame(pca_combat$x, meta)) +
 geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 
 ```
