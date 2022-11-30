@@ -155,7 +155,7 @@ return(res)
 }
 
 var_genes <- estimate_variability(expr[meta_genes$expressed,])
-meta_genes$highvar <- meta_genes$ensembl_gene_id_version %in% rownames(var_genes)[which(var_genes$padj<1)] #this line was cut in the tutorial so i completed it, but no idea if its right
+meta_genes$highvar <- meta_genes$ensembl_gene_id_version %in% rownames(var_genes)[which(var_genes$padj < 0.01)] 
 
 #Repeat the clustering and pca with highly variable genes
 corr_spearman_highvar <- cor(expr[meta_genes$highvar,], method = "spearman")
