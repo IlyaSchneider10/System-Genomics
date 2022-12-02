@@ -13,6 +13,9 @@ library(biomaRt)
 library(ggplot2)
 library(cowplot)
 library(here)
+BiocManager::install("DESeq2")
+BiocManager::install("sva")
+BiocManager::install("genefilter")
 library(sva)
 ```
 
