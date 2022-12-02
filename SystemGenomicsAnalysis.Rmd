@@ -187,3 +187,7 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 
 ```
 
+```{r}
+#Ancova
+```
+
