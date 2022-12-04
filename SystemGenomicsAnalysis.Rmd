@@ -9,6 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(BiocManager)
+BiocManager::install("biomaRt")
 library(biomaRt)
 library(ggplot2)
 library(cowplot)
@@ -16,7 +17,14 @@ library(here)
 BiocManager::install("DESeq2")
 BiocManager::install("sva")
 BiocManager::install("genefilter")
+BiocManager::install("biomaRt")
+BiocManager::install("ggrepel")
+library(biomaRt)
 library(sva)
+library(pbapply)
+library(devtools)
+devtools::install_github("slowkow/ggrepel")
+library(ggrepel)
 ```
 
 # 3_2 Import data to R
@@ -191,6 +199,39 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 ```
 
 ```{r}
-#Ancova
+#ANCOVA test between the different sexes with bonferoni correction for multiple testing
+pvals <- pbapply(expr[meta_genes$expressed,], 1, function(e){
+  dat <- data.frame(y = log1p(e),
+                    meta)
+  m1 <- lm(y ~ disease_state + Individual, data = dat)
+  m0 <- lm(y ~ Individual, data = dat)
+  test <- anova(m1, m0)
+  pval <- test$Pr[2]
+  return(unname(pval))
+})
+
+padj <- p.adjust(pvals, method = "bonferroni")
+
+fc <- pbapply(expr[meta_genes$expressed,], 1, function(e){
+  avg_disease <- tapply(log1p(e), meta$disease_state, mean)
+  return(exp(max(avg_disease) - min(avg_disease)))
+})
+
 ```
+
+```{r}
+#vulcano plot for logfold change -> check if gene labels are mapped correctly
+var_genes <- var_genes %>%
+  mutate(DE = padj < 0.1 & fc > 2) %>%
+  mutate(DEG = ifelse(DE, meta_genes$hgnc_symbol, NA))
+ggplot(var_genes, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
+  geom_point() +
+  geom_text_repel() +
+  geom_vline(xintercept=c(log(2), 0), col="#303030", linetype="dotted") +
+  geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
+  scale_color_manual(values=c("#909090", "red")) +
+  theme_minimal()
+
+```
+
 
