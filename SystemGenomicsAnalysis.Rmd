@@ -207,11 +207,11 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 
 ```{r}
 #ANOVA test between the different sexes with bonferoni correction for multiple testing
-De_test<- function(expr,
+DE_test<- function(expr,
                     cond,
                     ctrl = NULL,
                     covar = NULL,
-                    padj_method = "Bonferroni"){
+                    padj_method = "bonferroni"){
   pval_fc <- data.frame(t(pbapply(expr, 1, function(e){
     dat <- data.frame(y = log1p(e),
                       cond = cond)
@@ -289,6 +289,16 @@ smoothScatter(-log10(res_DESeq2$pvalue),
               -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
               xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
 
+table(p.adjust(res_DESeq2$pvalue, method="bonferroni") < 0.1,
+      res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj) < 0.1)
+```
+
+```{r}
+avg_expr <- sapply(sort(unique(meta$disease_state)), function(disease_state)
+  rowMeans(expr[,which(meta$disease_state == "Control")]))
+corr_DEG <- cor(avg_expr[res_DESeq2$gene[res_DESeq2$DE],], method = "spearman")
+hcl_DEG <- hclust(as.dist(1 - corr_DEG), method = "complete")
+plot(hcl_DEG, labels = FALSE)
 ```
 
 
