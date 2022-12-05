@@ -9,28 +9,29 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(BiocManager)
-BiocManager::install("biomaRt")
+#BiocManager::install("biomaRt")
 library(biomaRt)
 library(ggplot2)
 library(cowplot)
 library(here)
-BiocManager::install("DESeq2")
-BiocManager::install("sva")
-BiocManager::install("genefilter")
-BiocManager::install("biomaRt")
-BiocManager::install("ggrepel")
-BiocManager::install("DESeq2")
-BiocManager::install("Biostrings")
-BiocManager::install("tximport")
+#BiocManager::install("DESeq2")
+#BiocManager::install("sva")
+#BiocManager::install("genefilter")
+#BiocManager::install("biomaRt")
+#BiocManager::install("ggrepel")
+#BiocManager::install("DESeq2")
+#BiocManager::install("Biostrings")
+#BiocManager::install("tximport")
 library(tximport)
 library(biomaRt)
 library(sva)
 library(pbapply)
 library(devtools)
 library(Biostrings)
-devtools::install_github("slowkow/ggrepel")
+#devtools::install_github("slowkow/ggrepel")
 library(ggrepel)
 library(DESeq2)
+library(genefilter)
 
 ```
 
@@ -207,11 +208,11 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 
 ```{r}
 #ANOVA test between the different sexes with bonferoni correction for multiple testing
-De_test<- function(expr,
+DE_test<- function(expr,
                     cond,
                     ctrl = NULL,
                     covar = NULL,
-                    padj_method = "Bonferroni"){
+                    padj_method = "bonferroni"){
   pval_fc <- data.frame(t(pbapply(expr, 1, function(e){
     dat <- data.frame(y = log1p(e),
                       cond = cond)
