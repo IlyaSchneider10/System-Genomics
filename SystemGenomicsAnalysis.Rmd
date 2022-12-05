@@ -19,12 +19,19 @@ BiocManager::install("sva")
 BiocManager::install("genefilter")
 BiocManager::install("biomaRt")
 BiocManager::install("ggrepel")
+BiocManager::install("DESeq2")
+BiocManager::install("Biostrings")
+BiocManager::install("tximport")
+library(tximport)
 library(biomaRt)
 library(sva)
 library(pbapply)
 library(devtools)
+library(Biostrings)
 devtools::install_github("slowkow/ggrepel")
 library(ggrepel)
+library(DESeq2)
+
 ```
 
 # 3_2 Import data to R
@@ -199,38 +206,88 @@ geom_point(aes(x = PC1, y = PC2, color = Sex, shape = disease_state), size = 5)
 ```
 
 ```{r}
-#ANCOVA test between the different sexes with bonferoni correction for multiple testing
-pvals <- pbapply(expr[meta_genes$expressed,], 1, function(e){
-  dat <- data.frame(y = log1p(e),
-                    meta)
-  m1 <- lm(y ~ disease_state + Individual, data = dat)
-  m0 <- lm(y ~ Individual, data = dat)
-  test <- anova(m1, m0)
-  pval <- test$Pr[2]
-  return(unname(pval))
-})
-
-padj <- p.adjust(pvals, method = "bonferroni")
-
-fc <- pbapply(expr[meta_genes$expressed,], 1, function(e){
-  avg_disease <- tapply(log1p(e), meta$disease_state, mean)
-  return(exp(max(avg_disease) - min(avg_disease)))
-})
+#ANOVA test between the different sexes with bonferoni correction for multiple testing
+De_test<- function(expr,
+                    cond,
+                    ctrl = NULL,
+                    covar = NULL,
+                    padj_method = "Bonferroni"){
+  pval_fc <- data.frame(t(pbapply(expr, 1, function(e){
+    dat <- data.frame(y = log1p(e),
+                      cond = cond)
+    if (! is.null(covar))
+      dat <- data.frame(dat, covar)
+    m1 <- lm(y ~ ., data = dat)
+    m0 <- lm(y ~ . - cond, data = dat)
+    test <- anova(m1, m0)
+    pval <- test$Pr[2]
+    avgs <- tapply(log1p(e), cond, mean)
+    if (! is.null(ctrl) && sum(cond %in% ctrl) > 0){
+      fc <- exp(max(avgs[names(avgs) != ctrl]) - avgs[ctrl])
+    } else{
+      fc <- exp(max(avgs) - min(avgs))
+    }
+    return(c(pval = unname(pval), fc = unname(fc)))
+  })), row.names = rownames(expr))
+  padj <- p.adjust(pval_fc$pval, method = padj_method)
+  return(data.frame(pval_fc, "padj" = padj)[,c("pval","padj","fc")])
+}
+res_DE <- DE_test(expr = expr[meta_genes$expressed,],
+                  cond = meta$disease_state, 
+                  ctrl =  filter(meta, disease_state=="Control")) %>%
+  tibble::rownames_to_column("gene")
 
 ```
 
 ```{r}
 #vulcano plot for logfold change -> check if gene labels are mapped correctly
-var_genes <- var_genes %>%
+res_DE <- res_DE %>%
   mutate(DE = padj < 0.1 & fc > 2) %>%
   mutate(DEG = ifelse(DE, meta_genes$hgnc_symbol, NA))
-ggplot(var_genes, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
+ggplot(res_DE, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
   geom_point() +
   geom_text_repel() +
   geom_vline(xintercept=c(log(2), 0), col="#303030", linetype="dotted") +
   geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
   scale_color_manual(values=c("#909090", "red")) +
   theme_minimal()
+
+```
+```{r}
+#DE analysis with DESeq2
+
+ensembl <- useEnsembl(biomart = "ensembl",
+                      dataset = "hsapiens_gene_ensembl")
+tx2gene <- getBM(attributes = c("ensembl_transcript_id_version",
+                                "ensembl_gene_id_version"),
+                 filters = "ensembl_gene_id_version",
+                 values = rownames(expr),
+                 mart = ensembl) %>%
+  dplyr::select(ensembl_transcript_id_version, ensembl_gene_id_version)
+
+samples <-  list.files(here("EulerDownload", "rsem"))
+files <- file.path(here("EulerDownload", "rsem"), samples, paste0(samples,".isoforms.results"))
+txi <- tximport(files, type = "rsem", tx2gene = tx2gene)
+
+dds <- DESeqDataSetFromTximport(txi,
+                                colData = meta,
+                                design = ~ disease_state)
+
+dds_filtered <- dds[intersect(rownames(expr)[meta_genes$expressed], rownames(dds)),]
+dds_filtered <- DESeq(dds_filtered, test="Wald")
+res_DESeq2 <- results(dds_filtered)
+
+cor(res_DESeq2$padj,
+    res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj),
+    method="spearman", use="complete.obs")
+
+layout(matrix(1:2, nrow=1))
+plot(-log10(res_DESeq2$pvalue),
+     -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
+     xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
+smoothScatter(-log10(res_DESeq2$pvalue),
+              -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
+              xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
 
 ```
 
