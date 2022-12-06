@@ -12,6 +12,7 @@ library(BiocManager)
 #BiocManager::install("biomaRt")
 library(biomaRt)
 library(ggplot2)
+library(gplots)
 library(cowplot)
 library(here)
 #BiocManager::install("DESeq2")
@@ -32,6 +33,8 @@ library(Biostrings)
 library(ggrepel)
 library(DESeq2)
 library(genefilter)
+library(viridis)
+library(viridisLite)
 
 ```
 
@@ -331,11 +334,39 @@ table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
 # 3-5 Grouping of the identified DEGs
 
 ```{r}
-avg_expr <- sapply(sort(unique(meta$disease_state)), function(disease_state)
-  rowMeans(expr[,which(meta$disease_state == "Control")]))
-corr_DEG <- cor(avg_expr[res_DESeq2$gene[res_DESeq2$DE],], method = "spearman")
+#avg_expr <- sapply(sort(unique(meta$Run)), function(factor)
+ # rowMeans(expr[,which(meta$Run == factor)]))
+corr_DEG <- cor(t(expr[all_DEG$gene,]),method = "pearson")
 hcl_DEG <- hclust(as.dist(1 - corr_DEG), method = "complete")
-plot(hcl_DEG, labels = FALSE)
+plot(as.dendrogram(hcl_DEG, labels = FALSE))
+
+#Think if we want to differentiate between healthy and not here; for the goal of this part probably not
+
+``` 
+
+```{r,fig.width=6, fig.height=6}
+heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col=rainbow)
 ```
+```{r}
+#cut dendrogram clusters
+cl_DEG <- cutree(hcl_DEG, k = 9)
+heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col = rainbow,
+          ColSideColors = rainbow(6)[cl_DEG])
+
+#check avg expression level over disease state?
+avg_expr <- sapply(sort(unique(meta$disease_state)), function(factor)
+  rowMeans(expr[,which(meta$disease_state == factor)]))
+avg_expr_DEG_list <- tapply(names(cl_DEG), cl_DEG, function(x) avg_expr[x,])
+scaled_expr_DEG_list <- lapply(avg_expr_DEG_list, function(x) t(scale(t(x))))
+layout(matrix(1:9, nrow = 3, byrow = T))
+#par(mar=c(3,3,3,3))
+for(layer in unique(cl_DEG[hcl_DEG$order]))
+  boxplot(scaled_expr_DEG_list[[layer]],
+          main = paste0(layer, " (", nrow(scaled_expr_DEG_list[[layer]]), ")"))
+
+```
+
 
 
