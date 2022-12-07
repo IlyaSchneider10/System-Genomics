@@ -335,7 +335,7 @@ plot(as.dendrogram(hcl_DEG, labels = FALSE))
 
 ```{r,fig.width=6, fig.height=6}
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
-          trace = "none", scale = "none", labRow = NA, labCol = NA, col=rainbow)
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
 ```
 
 ```{r}
@@ -343,7 +343,7 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
 cl_DEG <- cutree(hcl_DEG, k = 9)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col = rainbow,
-          ColSideColors = rainbow(6)[cl_DEG])
+          ColSideColors = rainbow(9)[cl_DEG])
 
 #check avg expression level over disease state?
 avg_expr <- sapply(sort(unique(meta$disease_state)), function(factor)
@@ -355,6 +355,11 @@ layout(matrix(1:9, nrow = 3, byrow = T))
 for(layer in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[layer]],
           main = paste0(layer, " (", nrow(scaled_expr_DEG_list[[layer]]), ")"))
+
+##coexpression network analysis:
+#wgcna
+#deconvolution
+#boxplot group -> visualize per sample in each cluster
 
 ```
 
