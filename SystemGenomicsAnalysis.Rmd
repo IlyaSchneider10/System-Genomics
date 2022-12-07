@@ -318,12 +318,12 @@ table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
 
 #test same graph with DESeq_2 output
 test_DESeq2_df_new <- data.frame(gene=res_DESeq2@rownames, pval = res_DESeq2@listData[["pvalue"]], padj = res_DESeq2@listData[["padj"]], fc = 2^res_DESeq2@listData[["log2FoldChange"]])
-#replace all fc between 0 and 1 and change to positive fold achange by 1/fc
-test_DESeq2_df_new$fc[test_DESeq2_df_new$fc <1] <-  1/(test_DESeq2_df_new$fc[test_DESeq2_df_new$fc <1])
+#####OLD: replace all fc between 0 and 1 and change to positive fold achange by 1/fc
+#test_DESeq2_df_new$fc[test_DESeq2_df_new$fc <1] <-  1/(test_DESeq2_df_new$fc[test_DESeq2_df_new$fc <1])
 
 #vulcano plot for logfold change -> check if gene labels are mapped correctly
 test_DESeq2_df_new <- test_DESeq2_df_new %>%
-  mutate(DE = padj < 0.1 & fc > 2) %>%
+   mutate(DE = padj < 0.1 & fc > 2 | padj < 0.1 & fc < 0.5) %>%
   mutate(DEG = ifelse(DE, meta_genes$hgnc_symbol, NA))
 
 ggplot(test_DESeq2_df_new, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
@@ -356,7 +356,7 @@ plot(as.dendrogram(hcl_DEG, labels = FALSE))
 
 ```{r,fig.width=6, fig.height=6}
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
-          trace = "none", scale = "none", labRow = NA, labCol = NA, col=rainbow)
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
 ```
 
 ```{r}
@@ -364,7 +364,7 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
 cl_DEG <- cutree(hcl_DEG, k = 9)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col = rainbow,
-          ColSideColors = rainbow(6)[cl_DEG])
+          ColSideColors = rainbow(9)[cl_DEG])
 
 #check avg expression level over disease state?
 avg_expr <- sapply(sort(unique(meta$disease_state)), function(factor)
@@ -376,6 +376,11 @@ layout(matrix(1:9, nrow = 3, byrow = T))
 for(layer in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[layer]],
           main = paste0(layer, " (", nrow(scaled_expr_DEG_list[[layer]]), ")"))
+
+##coexpression network analysis:
+#wgcna
+#deconvolution
+#boxplot group -> visualize per sample in each cluster
 
 ```
 
