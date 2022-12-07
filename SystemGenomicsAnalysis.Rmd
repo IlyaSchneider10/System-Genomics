@@ -316,6 +316,10 @@ table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
 #extacted output from DESeq_2 (pval, padj,log2foldchange and gene name as rowname) and put it in same graph as before -> adjusted fold change to absolute values, as we had also negative ones; adjusted axes; SAME limit of padj<0.1 and fc>2 ->> OK?????
 ####data should be correctly adapted, but NAMES of ensemble_gene_id in meta_genes from DE and hgnc symbol should be checked
 
+#Remove NAs from the volcano plot
+back_up<-res_DESeq2
+res_DESeq2<-na.omit(res_DESeq2)
+
 #test same graph with DESeq_2 output
 test_DESeq2_df_new <- data.frame(gene=res_DESeq2@rownames, pval = res_DESeq2@listData[["pvalue"]], padj = res_DESeq2@listData[["padj"]], fc = 2^res_DESeq2@listData[["log2FoldChange"]])
 #####OLD: replace all fc between 0 and 1 and change to positive fold achange by 1/fc
@@ -326,19 +330,24 @@ test_DESeq2_df_new <- test_DESeq2_df_new %>%
    mutate(DE = padj < 0.1 & fc > 2 | padj < 0.1 & fc < 0.5) %>%
   mutate(DEG = ifelse(DE, meta_genes$hgnc_symbol, NA))
 
-ggplot(test_DESeq2_df_new, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
-  geom_point(alpha=0.4) +
-  geom_text_repel() +
-  geom_vline(xintercept=c(log(2), 0), col="#303030", linetype="dotted") +
-  geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
-  scale_color_manual(values=c("#909090", "red")) +
-  theme_minimal()
+#if DE=T but there is no gene assigned to it at DEG we remove it
+test_DESeq2_df_new<-test_DESeq2_df_new[-which(test_DESeq2_df_new$DEG==""),] 
 
 #save all DEGs in df
 all_DEG2 <- test_DESeq2_df_new[!is.na(test_DESeq2_df_new$DEG),]
 
+ggplot(test_DESeq2_df_new, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
+  geom_point(alpha=0.4) +
+  geom_text_repel() + # do not understand why labels on the left side dont appear, think if we want lables at all here
+  geom_vline(xintercept=c(log(2), -log(2)), col="#303030", linetype="dotted") +
+  geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
+  scale_color_manual(values=c("#909090", "red")) +
+  theme_minimal()
+
+
+
 table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
-      test_DESeq2_df_new %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj) < 0.1)
+      test_DESeq2_df_new %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj) < 0.1) #What is this table?
 ```
 
 # 3-5 Grouping of the identified DEGs
@@ -359,8 +368,8 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
           trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
 ```
 
-```{r}
-#cut dendrogram clusters
+```{r, eval=FALSE}
+#cut dendrogram clusters (DO NOT NEED THAT ANYMORE)
 cl_DEG <- cutree(hcl_DEG, k = 9)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col = rainbow,
