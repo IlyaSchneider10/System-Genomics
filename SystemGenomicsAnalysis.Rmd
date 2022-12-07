@@ -131,9 +131,30 @@ plot(1:length(eigs), eigs/sum(eigs)) # i think this is normalized now but i am n
 ```
 
 ```{r}
-#Visualize first two pcas
-ggplot(data.frame(pca$x, meta)) +
-geom_point(aes(x = PC1, y = PC2, color = disease_state, shape = Sex), size = 5)
+#Visualize the first three pca combinations
+pcas_considered=3
+
+for (p1 in seq(pcas_considered)){
+  
+  if(p1<pcas_considered){
+    
+    print(ggplot(data.frame(pca$x, meta)) +
+    geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state, shape = Sex), size = 5)
+    +xlab(paste0("PC",p1))
+    +ylab(paste0("PC",p1+1)))
+    
+  }
+  
+  else{
+    
+    print(ggplot(data.frame(pca$x, meta)) +
+    geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state, shape = Sex), size = 5)
+    +xlab(paste0("PC",p1-2))
+    +ylab(paste0("PC",p1)))
+    
+  }
+    
+}
 ```
 
 ```{r, eval=FALSE}
