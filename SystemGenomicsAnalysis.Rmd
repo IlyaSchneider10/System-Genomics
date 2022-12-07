@@ -9,33 +9,22 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(BiocManager)
-#BiocManager::install("biomaRt")
 library(biomaRt)
 library(ggplot2)
 library(gplots)
 library(cowplot)
 library(here)
-#BiocManager::install("DESeq2")
-#BiocManager::install("sva")
-#BiocManager::install("genefilter")
-#BiocManager::install("biomaRt")
-#BiocManager::install("ggrepel")
-#BiocManager::install("DESeq2")
-#BiocManager::install("Biostrings")
-#BiocManager::install("tximport")
 library(tximport)
 library(biomaRt)
 library(sva)
 library(pbapply)
 library(devtools)
 library(Biostrings)
-#devtools::install_github("slowkow/ggrepel")
 library(ggrepel)
 library(DESeq2)
 library(genefilter)
 library(viridis)
 library(viridisLite)
-
 ```
 
 # 3_2 Import data to R
@@ -297,7 +286,7 @@ smoothScatter(-log10(res_DESeq2$pvalue),
               -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
               xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
 
-table(p.adjust(res_DESeq2$pvalue, method="bonferroni") < 0.1,
+table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
       res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj) < 0.1)
 ```
 
@@ -336,7 +325,7 @@ table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
 ```{r}
 #avg_expr <- sapply(sort(unique(meta$Run)), function(factor)
  # rowMeans(expr[,which(meta$Run == factor)]))
-corr_DEG <- cor(t(expr[all_DEG$gene,]),method = "pearson")
+corr_DEG <- cor(t(expr[all_DEG2$gene,]),method = "pearson")
 hcl_DEG <- hclust(as.dist(1 - corr_DEG), method = "complete")
 plot(as.dendrogram(hcl_DEG, labels = FALSE))
 
@@ -348,6 +337,7 @@ plot(as.dendrogram(hcl_DEG, labels = FALSE))
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col=rainbow)
 ```
+
 ```{r}
 #cut dendrogram clusters
 cl_DEG <- cutree(hcl_DEG, k = 9)
