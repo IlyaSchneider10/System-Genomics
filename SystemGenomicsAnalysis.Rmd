@@ -370,7 +370,8 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
 #Cut dendrogram clusters (Only two clusters BD and control)
 cl_DEG <- cutree(hcl_DEG, k = 2)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
-          trace = "none", scale = "none", labRow = NA, labCol = NA, col = viridis)
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col = viridis,
+          ColSideColors = rainbow(2)[cl_DEG])
 
 #Boxplot for each gene
 expr_DEG_list <- tapply(names(cl_DEG), cl_DEG, function(x) expr[x,])
@@ -378,7 +379,7 @@ scaled_expr_DEG_list <- lapply(expr_DEG_list, function(x) t(scale(t(x))))
 for(cluster in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[cluster]], las = 2,
           main = paste0("Cluster ",cluster, " (", nrow(scaled_expr_DEG_list[[cluster]]), ")"),
-          names=meta$disease_state)
+          names=paste0(meta$disease_state,"\n", meta$Sex))
 ```
 
 
