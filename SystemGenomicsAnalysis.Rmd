@@ -8,13 +8,6 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install(version = "3.16")
-BiocManager::install("WGCNA")
-install.packages(c("matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival", "BiocManager"))
-BiocManager::install(c("GO.db", "preprocessCore", "impute"));
-
 library(dplyr)
 library(BiocManager)
 library(biomaRt)
@@ -393,9 +386,11 @@ for(cluster in unique(cl_DEG[hcl_DEG$order]))
 
 ```{r}
 #WGCNA / coexpression analysis for BD individuals
+
+
 expr_DEG_BD = t(expr[all_DEG2$gene, 1:6])
 
-powers = c(c(1:10), seq(from = 12, to=28, by=2))
+powers = c(c(1:10), seq(from = 12, to=40, by=2))
 
 sft = pickSoftThreshold(expr_DEG_BD, powerVector = powers, verbose = 5)
 
@@ -417,7 +412,6 @@ main = paste("Mean connectivity"))
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 
 #if we get really bored and lonely one could do step 3 of the tutorial and correlate external clinical traits to our modules (e.g sex)
-#deconvolution
 net = blockwiseModules(expr_DEG_BD, power = 28,
 TOMType = "unsigned", minModuleSize = 30,
 reassignThreshold = 0, mergeCutHeight = 0.25,
@@ -445,7 +439,7 @@ addGuide = TRUE, guideHang = 0.05)
 #wgcna / coexpression analysis for control patients
 expr_DEG_CTRL = t(expr[all_DEG2$gene, 7:12])
 
-powers = c(c(1:10), seq(from = 12, to=28, by=2))
+powers = c(c(1:10), seq(from = 12, to=40, by=2))
 
 sft = pickSoftThreshold(expr_DEG_CTRL, powerVector = powers, verbose = 5)
 
@@ -497,17 +491,20 @@ options(stringsAsFactors = FALSE)
 allowWGCNAThreads()
 
 
-expr_DEG_list=list(expr_DEG_BD,expr_DEG_CTRL)
+expr_DEG_list=list(list(as.data.frame(expr_DEG_BD)),list(as.data.frame(expr_DEG_CTRL)))
+names(expr_DEG_list[[1]])<-"data"
+names(expr_DEG_list[[2]])<-"data"
+
+setLabels = c("BD", "Control")
 
 nSets = 2
 
-# Choose a set of soft-thresholding powers
-powers = c(seq(4,10,by=1), seq(12,20, by=2));
+powers = c(seq(4,10,by=1), seq(12,40, by=2));
 # Initialize a list to hold the results of scale-free analysis
 powerTables = vector(mode = "list", length = nSets);
 # Call the network topology analysis function for each set in turn
 for (set in 1:nSets)
-powerTables[[set]] = list(data = pickSoftThreshold(expr_DEG_list[[set]], powerVector=powers,
+powerTables[[set]] = list(data = pickSoftThreshold(expr_DEG_list[[set]]$data, powerVector=powers,
 verbose = 2)[[2]]);
 collectGarbage();
 # Plot the results:
@@ -550,22 +547,40 @@ text(powerTables[[set]]$data[,1], powerTables[[set]]$data[,plotCols[col]],
 labels=powers,cex=cex1,col=colors[set]);
 if (col==1)
 {
-legend("bottomright", legend = 'BDtry', col = colors, pch = 20) ;
+legend("bottomright", legend = setLabels, col = colors, pch = 20) ;
 } else
-legend("topright", legend = 'CTRLtry', col = colors, pch = 20) ;
+legend("topright", legend = setLabels, col = colors, pch = 20) ;
 }
-dev.off();
+dev.off()
 
+net = blockwiseConsensusModules(
+expr_DEG_list, power = 26, minModuleSize = 30, deepSplit = 2,
+pamRespectsDendro = FALSE,
+mergeCutHeight = 0.25, numericLabels = TRUE,
+minKMEtoStay = 0,
+saveTOMs = TRUE, verbose = 5)
 
+consMEs = net$multiMEs
+moduleLabels = net$colors;
+# Convert the numeric labels to color labels
+moduleColors = labels2colors(moduleLabels)
+consTree = net$dendrograms[[1]];
+
+sizeGrWindow(8,6);
+#pdf(file = "Plots/ConsensusDendrogram-auto.pdf", wi = 8, he = 6)
+plotDendroAndColors(consTree, moduleColors,
+"Module colors",
+dendroLabels = FALSE, hang = 0.03,
+addGuide = TRUE, guideHang = 0.05,
+main = "Consensus gene dendrogram and module colors")
+dev.off()
 ```
-
-
-
 
 
 ```{r}
-
+# Relating consensus modules to BD set-specific modules
 ```
+
 ```{r}
 
 ```
