@@ -27,7 +27,6 @@ library(genefilter)
 library(viridis)
 library(viridisLite)
 library(WGCNA)
-library(plotly)
 ```
 
 # 3_2 Import data to R
@@ -128,7 +127,7 @@ plot(hcl_spearman, labels = meta$disease_state)
 
 ```{r}
 #Dimension reduced with PCA
-pca <- prcomp(log1p(t(expr[meta_genes$expressed,])), center = TRUE, scale. = TRUE)
+pca <- prcomp(log1p(t(expr[meta_genes$expressed,])), center = T, scale. = T)
 eigs <- pca$sdev^2
 plot(1:length(eigs), eigs/sum(eigs)) # i think this is normalized now but i am not sure
 ```
@@ -158,11 +157,6 @@ for (p1 in seq(pcas_considered)){
   }
     
 }
-
-#3D plot with first three PC
-
-plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
-
 ```
 
 ```{r, eval=FALSE}
@@ -374,7 +368,7 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
           trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
 ```
 
-```{r, eval=FALSE}
+```{r}
 #Cut dendrogram clusters (Only two clusters BD and control)
 cl_DEG <- cutree(hcl_DEG, k = 2)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
