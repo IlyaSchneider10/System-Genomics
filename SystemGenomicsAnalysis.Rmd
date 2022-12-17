@@ -28,6 +28,9 @@ library(viridis)
 library(viridisLite)
 library(WGCNA)
 library(plotly)
+
+library(fgsea)
+library(msigdbr)
 ```
 
 # 3_2 Import data to R
@@ -524,3 +527,49 @@ plot_module_heatmaps(modules_BD_list)
 #Plot Control modules
 plot_module_heatmaps(modules_Control_list)
 ```
+
+# 3.6 DAVID
+
+```{r}
+#table for used cluster to analyse expression
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% names(which(cl_DEG==2)), "ensembl_gene_id"],
+            file = "genes_C2.txt",
+            quote = F, row.names = F, col.names = F)
+#table for used background, all expressed
+write.table(meta_genes[meta_genes$expressed, "ensembl_gene_id"],
+            file = "genes_expressed.txt",
+            quote = F, row.names = F, col.names = F)
+#table for background for all DE genes
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% all_DEG2$gene, "ensembl_gene_id"],
+            file = "genes_DE.txt",
+            quote = F, row.names = F, col.names = F)
+
+
+```
+
+## Enrichment analysis : rank distribution analysis
+
+```{r, eval=FALSE}
+##optional: Enrichment analysis : rank distribution analysis
+scores <- setNames(sign(log(all_DEG2$fc)) * (-log10(all_DEG2$pval)),
+                   setNames(meta_genes$ensembl_gene_id,
+                            meta_genes$ensembl_gene_id_version)[all_DEG2$gene])
+scores_ordered <- sort(scores, decreasing=T)
+
+genesets_celltype <- msigdbr(species = "Homo sapiens", category = "C8")
+genesets_celltype_list <- tapply(genesets_celltype$ensembl_gene, genesets_celltype$gs_name, list)
+
+fgsea_kegg <- fgsea(pathways = genesets_celltype_list,
+stats = scores_ordered,
+minSize  = 15,
+maxSize  = 500)
+
+fgsea_kegg[order(NES,decreasing=T),][1:10,1:7]
+
+#plot GSEA results of one gene
+plotEnrichment(genesets_celltype_list[["DESCARTES_FETAL_CEREBELLUM_MICROGLIA"]],
+               scores_ordered) + labs(title="hNbML5 GABAergic neurons")
+
+```
+
+
