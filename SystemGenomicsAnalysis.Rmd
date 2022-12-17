@@ -163,8 +163,9 @@ for (p1 in seq(pcas_considered)){
 }
 
 #3D plot with first three PC
-PCA_3D <- plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
-htmlwidgets::saveWidget(as_widget(PCA_3D), "PCA_3D.html")
+#PCA_3D <- 
+  plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
+#htmlwidgets::saveWidget(as_widget(PCA_3D), "PCA_3D.html")
 
 ```
 
@@ -390,7 +391,7 @@ scaled_expr_DEG_list <- lapply(expr_DEG_list, function(x) t(scale(t(x))))
 for(cluster in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[cluster]], las = 2,
           main = paste0("Cluster ",cluster, " (", nrow(scaled_expr_DEG_list[[cluster]]), ")"),
-          names=paste0(meta$disease_state,"\n", meta$Sex))
+          names=paste0(meta$Individual))
 ```
 
 ```{r}
@@ -504,6 +505,7 @@ geneTree_Control = net$dendrograms[[1]];
 #Create module heatmaps
 modules_BD_list=split(names(moduleLabels_BD),moduleLabels_BD)
 modules_Control_list=split(names(moduleLabels_Control),moduleLabels_Control)
+all_modules<-append(modules_BD_list,modules_Control_list)
 
 plot_module_heatmaps <- function(module_list) {
   
@@ -527,6 +529,18 @@ plot_module_heatmaps(modules_BD_list)
 #Plot Control modules
 plot_module_heatmaps(modules_Control_list)
 ```
+```{r}
+#boxplots for different modules: 1,2, 3 BD upregulated; 4,5 healthy upregulated
+for (module in 1:length(all_modules)){
+  expr_modules<-expr[all_modules[[module]],]
+  scaled_expr_modules<-t(scale(t(expr_modules)))
+  
+  boxplot(scaled_expr_modules, las = 2,
+          main = paste0("Cluster ",module),
+          names=paste0(meta$disease_state))
+}
+```
+
 
 # 3.6 DAVID
 
@@ -573,7 +587,8 @@ scores <- setNames(sign(log(all_DEG2$fc)) * (-log10(all_DEG2$pval)),
                             meta_genes$ensembl_gene_id_version)[all_DEG2$gene])
 scores_ordered <- sort(scores, decreasing=T)
 
-genesets_celltype <- msigdbr(species = "Homo sapiens", category = "C8")
+genesets_celltype <- msigdbr(species = "Homo sapiens", category = "C5")
+
 genesets_celltype_list <- tapply(genesets_celltype$ensembl_gene, genesets_celltype$gs_name, list)
 
 fgsea_kegg <- fgsea(pathways = genesets_celltype_list,
@@ -583,9 +598,9 @@ maxSize  = 500)
 
 fgsea_kegg[order(NES,decreasing=T),][1:10,1:7]
 
-#plot GSEA results of one gene
-plotEnrichment(genesets_celltype_list[["DESCARTES_FETAL_CEREBELLUM_MICROGLIA"]],
-               scores_ordered) + labs(title="hNbML5 GABAergic neurons")
+#possible plots for GSEA results of one subset
+plotEnrichment(genesets_celltype_list[["GOBP_ION_TRANSPORT"]],
+               scores_ordered) + labs(title="GOBP_ION_TRANSPORT")
 
 ```
 
