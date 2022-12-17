@@ -163,8 +163,9 @@ for (p1 in seq(pcas_considered)){
 }
 
 #3D plot with first three PC
+PCA_3D <- plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
+htmlwidgets::saveWidget(as_widget(PCA_3D), "PCA_3D.html")
 
-plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
 ```
 
 ```{r, eval=FALSE}
@@ -393,9 +394,9 @@ for(cluster in unique(cl_DEG[hcl_DEG$order]))
 ```
 
 ```{r}
-#WGCNA / coexpression analysis for BD individuals
+#WGCNA / coexpression analysis for cluster 2 (highly BD) individuals
 
-expr_DEG_BD = t(expr[all_DEG2$gene, 1:6])
+expr_DEG_BD = t(expr_DEG_list[[2]])
 
 powers = c(c(1:10), seq(from = 12, to=40, by=2))
 
@@ -419,7 +420,7 @@ main = paste("Mean connectivity"))
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 
 #if we get really bored and lonely one could do step 3 of the tutorial and correlate external clinical traits to our modules (e.g sex)
-net = blockwiseModules(expr_DEG_BD, power = 28,
+net = blockwiseModules(expr_DEG_BD, power = 22,
 TOMType = "unsigned", minModuleSize = 30,
 reassignThreshold = 0, mergeCutHeight = 0.25,
 numericLabels = TRUE, pamRespectsDendro = FALSE,
@@ -447,8 +448,8 @@ geneTree_BD = net$dendrograms[[1]];
 ```
 
 ```{r}
-#wgcna / coexpression analysis for control patients
-expr_DEG_CTRL = t(expr[all_DEG2$gene, 7:12])
+#wgcna / coexpression analysis for cluster 1 (highly healthy) patients
+expr_DEG_CTRL = t(expr_DEG_list[[1]])
 
 powers = c(c(1:10), seq(from = 12, to=40, by=2))
 
@@ -473,7 +474,7 @@ text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 
 #if we get really bored and lonely one could do step 3 of the tutorial and correlate external clinical traits to our modules (e.g sex)
 #deconvolution
-net = blockwiseModules(expr_DEG_CTRL, power = 26,
+net = blockwiseModules(expr_DEG_CTRL, power = 20,
 TOMType = "unsigned", minModuleSize = 30,
 reassignThreshold = 0, mergeCutHeight = 0.25,
 numericLabels = TRUE, pamRespectsDendro = FALSE,
@@ -506,8 +507,7 @@ modules_Control_list=split(names(moduleLabels_Control),moduleLabels_Control)
 
 plot_module_heatmaps <- function(module_list) {
   
-for (module in module_list[c(2:length(module_list))]){ #we skip the first module since it contains the genes that have not been assigned a module
-  
+for (module in module_list){ 
     module_corr <- cor(t(expr[module,]),method = "pearson")
     module_dendo <- hclust(as.dist(1 - module_corr), method = "complete")
 
@@ -539,9 +539,26 @@ write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% names(which(cl_DE
 write.table(meta_genes[meta_genes$expressed, "ensembl_gene_id"],
             file = "genes_expressed.txt",
             quote = F, row.names = F, col.names = F)
-#table for background for all DE genes
-write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% all_DEG2$gene, "ensembl_gene_id"],
-            file = "genes_DE.txt",
+
+##NEW: clusterwise
+#first BD cluster 2
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_BD_list[["0"]], "ensembl_gene_id"],
+            file = "genes_cluster2BD_0.txt",
+            quote = F, row.names = F, col.names = F)
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_BD_list[["1"]], "ensembl_gene_id"],
+            file = "genes_cluster2BD_1.txt",
+            quote = F, row.names = F, col.names = F)
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_BD_list[["2"]], "ensembl_gene_id"],
+            file = "genes_cluster2BD_2.txt",
+            quote = F, row.names = F, col.names = F)
+
+
+#second healthy cluster 1
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_Control_list[["0"]], "ensembl_gene_id"],
+            file = "genes_cluster1CTRL_0.txt",
+            quote = F, row.names = F, col.names = F)
+write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_Control_list[["1"]], "ensembl_gene_id"],
+            file = "genes_cluster1CTRL_1.txt",
             quote = F, row.names = F, col.names = F)
 
 
