@@ -231,7 +231,7 @@ geom_point(aes(x = PC1, y = PC2, color = disease_state, shape = Sex), size = 5)
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 #ANOVA test between the different sexes with bonferoni correction for multiple testing
 DE_test<- function(expr,
                     cond,
@@ -265,7 +265,7 @@ res_DE <- DE_test(expr = expr[meta_genes$expressed,],
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 #vulcano plot for logfold change -> check if gene labels are mapped correctly
 res_DE <- res_DE %>%
   mutate(DE = padj < 0.1 & fc > 2) %>%
@@ -304,7 +304,7 @@ dds_filtered <- DESeq(dds_filtered, test="Wald")
 res_DESeq2 <- results(dds_filtered)
 ```
 
-```{r}
+```{r, eval=FALSE}
 #plot correlation of methods
 
 cor(res_DESeq2$padj,
@@ -391,7 +391,6 @@ for(cluster in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[cluster]], las = 2,
           main = paste0("Cluster ",cluster, " (", nrow(scaled_expr_DEG_list[[cluster]]), ")"),
           names=meta$disease_state)
-          names=meta$Individual)
 ```
 
 ```{r}
@@ -472,6 +471,13 @@ moduleColors_expr_DEG_cluster_2<-wgcna_split_into_modules(expr_DEG_cluster_2,22)
 ```
 
 ```{r}
+#Feed all DEG from all the patients at once
+wgcna_check_threshold(t(expr[all_DEG2$gene,])) #we pick threshold 18 from the graph
+moduleColors_expr_ALL<-wgcna_split_into_modules(t(expr[all_DEG2$gene,]),18)
+```
+
+
+```{r}
 #Create module heatmaps function
 
 plot_module_heatmaps <- function(module_list) {
@@ -519,6 +525,14 @@ modules_Cluster_Two_list=split(names(moduleColors_expr_DEG_cluster_2),moduleColo
 plot_module_heatmaps(modules_Cluster_Two_list)
 ```
 
+```{r,fig.width=6, fig.height=6}
+#Plot cluster one modules
+
+modules_Cluster_ALL_list<-split(names(moduleColors_expr_ALL),moduleColors_expr_ALL)
+
+plot_module_heatmaps(modules_Cluster_ALL_list)
+```
+
 ```{r}
 #boxplots for different modules
 
@@ -540,7 +554,7 @@ plot_boxplots_modules<- function(module_list){
 plot_boxplots_modules(all_patient_modules)
 plot_boxplots_modules(all_cluster_modules)
 
-
+plot_boxplots_modules(modules_Cluster_ALL_list)
 
 ```
 
