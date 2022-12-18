@@ -28,7 +28,6 @@ library(viridis)
 library(viridisLite)
 library(WGCNA)
 library(plotly)
-
 library(fgsea)
 library(msigdbr)
 ```
@@ -104,6 +103,7 @@ ggplot(data.frame(avg_expr), aes(x=avg_expr)) +
 num_det <- rowSums(expr > 0)
 hist(num_det)
 ```
+
 ```{r}
 #mark unexpressed or extremely low expressed genes
 expressed <- rowMeans(expr > 0) >= 0.5 | rowMeans(expr) >= 1
@@ -145,7 +145,7 @@ for (p1 in seq(pcas_considered)){
   if(p1<pcas_considered){
     
     print(ggplot(data.frame(pca$x, meta)) +
-    geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state, shape = Sex), size = 5)
+    geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1))
     +ylab(paste0("PC",p1+1)))
     
@@ -154,7 +154,7 @@ for (p1 in seq(pcas_considered)){
   else{
     
     print(ggplot(data.frame(pca$x, meta)) +
-    geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state, shape = Sex), size = 5)
+    geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1-2))
     +ylab(paste0("PC",p1)))
     
@@ -329,7 +329,6 @@ table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
 ####data should be correctly adapted, but NAMES of ensemble_gene_id in meta_genes from DE and hgnc symbol should be checked
 
 #Remove NAs from the volcano plot
-back_up<-res_DESeq2
 res_DESeq2<-na.omit(res_DESeq2)
 
 #test same graph with DESeq_2 output
@@ -378,7 +377,7 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
           trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
 ```
 
-```{r}
+```{r,fig.width=6, fig.height=6}
 #Cut dendrogram clusters (Only two clusters BD and control)
 cl_DEG <- cutree(hcl_DEG, k = 2)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
@@ -391,121 +390,89 @@ scaled_expr_DEG_list <- lapply(expr_DEG_list, function(x) t(scale(t(x))))
 for(cluster in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[cluster]], las = 2,
           main = paste0("Cluster ",cluster, " (", nrow(scaled_expr_DEG_list[[cluster]]), ")"),
-          names=paste0(meta$Individual))
+          names=meta$disease_state)
+          names=meta$Individual)
 ```
 
 ```{r}
-#WGCNA / coexpression analysis for cluster 2 (highly BD) individuals
+#WGCNA / coexpression analysis
 
-expr_DEG_BD = t(expr_DEG_list[[2]])
+wgcna_check_threshold <- function(expression_df) {
+  
+  powers = c(c(1:10), seq(from = 12, to=30, by=2))
 
-powers = c(c(1:10), seq(from = 12, to=40, by=2))
+  sft = pickSoftThreshold(expression_df, powerVector = powers, verbose = 5)
+  
+  sizeGrWindow(9, 5)
+  par(mfrow = c(1,2));
+  cex1 = 0.9;
+  
+  plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+  xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
+  main = paste("Scale independence"));
+  text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+  labels=powers,cex=cex1,col="red");
+  
+  abline(h=0.90,col="red")
+  
+  plot(sft$fitIndices[,1], sft$fitIndices[,5],
+  xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
+  main = paste("Mean connectivity"))
+  text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+}
 
-sft = pickSoftThreshold(expr_DEG_BD, powerVector = powers, verbose = 5)
-
-sizeGrWindow(9, 5)
-par(mfrow = c(1,2));
-cex1 = 0.9;
-
-plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
-xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
-main = paste("Scale independence"));
-text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
-labels=powers,cex=cex1,col="red");
-
-abline(h=0.90,col="red")
-
-plot(sft$fitIndices[,1], sft$fitIndices[,5],
-xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
-main = paste("Mean connectivity"))
-text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
-
-#if we get really bored and lonely one could do step 3 of the tutorial and correlate external clinical traits to our modules (e.g sex)
-net = blockwiseModules(expr_DEG_BD, power = 22,
-TOMType = "unsigned", minModuleSize = 30,
-reassignThreshold = 0, mergeCutHeight = 0.25,
-numericLabels = TRUE, pamRespectsDendro = FALSE,
-saveTOMs = TRUE,
-saveTOMFileBase = "expr_TOM",
-verbose = 3)
-
-table(net$colors)
-
-net$dendrograms[[1]]
-
-
-sizeGrWindow(12, 9)
-mergedColors = labels2colors(net$colors)
-plotDendroAndColors(net$dendrograms[[1]], mergedColors[net$blockGenes[[1]]],
-"Module colors",
-dendroLabels = FALSE, hang = 0.03,
-addGuide = TRUE, guideHang = 0.05)
-
-moduleLabels_BD = net$colors
-moduleColors_BD = labels2colors(net$colors)
-MEs_BD = net$MEs;
-geneTree_BD = net$dendrograms[[1]];
-
+wgcna_split_into_modules<- function(expression_df, power_threshold) {
+  net = blockwiseModules(expression_df, power = power_threshold,
+  TOMType = "unsigned", minModuleSize = 30,
+  reassignThreshold = 0, mergeCutHeight = 0.25,
+  numericLabels = TRUE, pamRespectsDendro = FALSE,
+  saveTOMs = TRUE,
+  saveTOMFileBase = "expr_TOM",
+  verbose = 3)
+  
+  sizeGrWindow(12, 9)
+  mergedColors = labels2colors(net$colors)
+  plotDendroAndColors(net$dendrograms[[1]], mergedColors[net$blockGenes[[1]]],
+  "Module colors",
+  dendroLabels = FALSE, hang = 0.03,
+  addGuide = TRUE, guideHang = 0.05)
+  
+  moduleColors = net$colors
+  
+  return(moduleColors)
+}
 ```
 
 ```{r}
-#wgcna / coexpression analysis for cluster 1 (highly healthy) patients
-expr_DEG_CTRL = t(expr_DEG_list[[1]])
+expr_DEG_BD_patients <- t(expr[all_DEG2$gene,1:6]) #only BD patients
 
-powers = c(c(1:10), seq(from = 12, to=40, by=2))
-
-sft = pickSoftThreshold(expr_DEG_CTRL, powerVector = powers, verbose = 5)
-
-sizeGrWindow(9, 5)
-par(mfrow = c(1,2));
-cex1 = 0.9;
-
-plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
-xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
-main = paste("Scale independence"));
-text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
-labels=powers,cex=cex1,col="red");
-
-abline(h=0.90,col="red")
-
-plot(sft$fitIndices[,1], sft$fitIndices[,5],
-xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
-main = paste("Mean connectivity"))
-text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
-
-#if we get really bored and lonely one could do step 3 of the tutorial and correlate external clinical traits to our modules (e.g sex)
-#deconvolution
-net = blockwiseModules(expr_DEG_CTRL, power = 20,
-TOMType = "unsigned", minModuleSize = 30,
-reassignThreshold = 0, mergeCutHeight = 0.25,
-numericLabels = TRUE, pamRespectsDendro = FALSE,
-saveTOMs = TRUE,
-saveTOMFileBase = "expr_TOM",
-verbose = 3)
-
-table(net$colors)
-
-net$dendrograms[[1]]
-
-sizeGrWindow(12, 9)
-mergedColors = labels2colors(net$colors)
-plotDendroAndColors(net$dendrograms[[1]], mergedColors[net$blockGenes[[1]]],
-"Module colors",
-dendroLabels = FALSE, hang = 0.03,
-addGuide = TRUE, guideHang = 0.05)
-
-moduleLabels_Control = net$colors
-moduleColors_Control = labels2colors(net$colors)
-MEs_Control = net$MEs;
-geneTree_Control = net$dendrograms[[1]];
-
+wgcna_check_threshold(expr_DEG_BD_patients) #we pick threshold 26 from the graph
+moduleColors_expr_DEG_BD_patients<-wgcna_split_into_modules(expr_DEG_BD_patients,26)
 ```
 
 ```{r}
-#Create module heatmaps
-modules_BD_list=split(names(moduleLabels_BD),moduleLabels_BD)
-modules_Control_list=split(names(moduleLabels_Control),moduleLabels_Control)
-all_modules<-append(modules_BD_list,modules_Control_list)
+expr_DEG_Control_patients<-t(expr[all_DEG2$gene,7:12]) #only Control patients
+
+wgcna_check_threshold(expr_DEG_Control_patients) #we pick threshold 26 from the graph
+moduleColors_expr_DEG_Control_patients<-wgcna_split_into_modules(expr_DEG_Control_patients,26)
+```
+
+```{r}
+expr_DEG_cluster_1 = t(expr_DEG_list[[1]]) #only cluster 1 genes
+
+wgcna_check_threshold(expr_DEG_cluster_1) #we pick threshold 20 from the graph
+moduleColors_expr_DEG_cluster_1<-wgcna_split_into_modules(expr_DEG_cluster_1,20)
+```
+
+```{r}
+expr_DEG_cluster_2= t(expr_DEG_list[[2]]) #only cluster 2 genes
+
+wgcna_check_threshold(expr_DEG_cluster_2) #we pick threshold 22 from the graph
+moduleColors_expr_DEG_cluster_2<-wgcna_split_into_modules(expr_DEG_cluster_2,22)
+```
+
+```{r}
+#Create module heatmaps function
 
 plot_module_heatmaps <- function(module_list) {
   
@@ -518,33 +485,68 @@ for (module in module_list){
 }
   
 }
-
 ```
 
 ```{r,fig.width=6, fig.height=6}
 #Plot BD modules
+
+modules_BD_list=split(names(moduleColors_expr_DEG_BD_patients),moduleColors_expr_DEG_BD_patients)
+
 plot_module_heatmaps(modules_BD_list)
 ```
+
 ```{r,fig.width=6, fig.height=6}
 #Plot Control modules
+
+modules_Control_list=split(names(moduleColors_expr_DEG_Control_patients),moduleColors_expr_DEG_Control_patients)
+
 plot_module_heatmaps(modules_Control_list)
 ```
+
+```{r,fig.width=6, fig.height=6}
+#Plot cluster one modules
+
+modules_Cluster_One_list=split(names(moduleColors_expr_DEG_cluster_1),moduleColors_expr_DEG_cluster_1)
+
+plot_module_heatmaps(modules_Cluster_One_list)
+```
+
+```{r,fig.width=6, fig.height=6}
+#Plot cluster one modules
+
+modules_Cluster_Two_list=split(names(moduleColors_expr_DEG_cluster_2),moduleColors_expr_DEG_cluster_2)
+
+plot_module_heatmaps(modules_Cluster_Two_list)
+```
+
 ```{r}
-#boxplots for different modules: 1,2, 3 BD upregulated; 4,5 healthy upregulated
-for (module in 1:length(all_modules)){
-  expr_modules<-expr[all_modules[[module]],]
+#boxplots for different modules
+
+all_patient_modules<-append(modules_BD_list,modules_Control_list) #1-7 BD specific WGCNA clusters, 8-12 control specific WGCNA clusters
+all_cluster_modules<-append(modules_Cluster_One_list,modules_Cluster_Two_list) # 1,2 healthy upregulated; 3,4,5 BD upregulated; 
+
+plot_boxplots_modules<- function(module_list){
+  
+  for (module in 1:length(module_list)){
+  expr_modules<-expr[module_list[[module]],]
   scaled_expr_modules<-t(scale(t(expr_modules)))
   
   boxplot(scaled_expr_modules, las = 2,
           main = paste0("Cluster ",module),
           names=paste0(meta$disease_state))
 }
-```
+}
 
+plot_boxplots_modules(all_patient_modules)
+plot_boxplots_modules(all_cluster_modules)
+
+
+
+```
 
 # 3.6 DAVID
 
-```{r}
+```{r, eval=FALSE}
 #table for used cluster to analyse expression
 write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% names(which(cl_DEG==2)), "ensembl_gene_id"],
             file = "genes_C2.txt",
@@ -598,10 +600,14 @@ maxSize  = 500)
 
 fgsea_kegg[order(NES,decreasing=T),][1:10,1:7]
 
-#possible plots for GSEA results of one subset
+##possible plots for GSEA results of one subset
 plotEnrichment(genesets_celltype_list[["GOBP_ION_TRANSPORT"]],
                scores_ordered) + labs(title="GOBP_ION_TRANSPORT")
 
+#filter out GO we have similar with paper
+fgsea_kegg %>% filter( grepl('REGULATION_OF_CELLULAR|ION_TRANS|HOMEO|CELL_DEATH|VESICLE|CELLULAR_BIO|NERVOUS', pathway)) %>% arrange(desc(NES)) -> GO_paper
+
+write.csv(GO_paper[,1:7], here("GO_paper.csv"), row.names=FALSE)
 ```
 
 
