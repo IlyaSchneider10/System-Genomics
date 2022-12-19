@@ -375,8 +375,9 @@ plot(as.dendrogram(hcl_DEG, labels = FALSE))
 ``` 
 
 ```{r,fig.width=6, fig.height=6}
+jpeg(file="heatmap.jpg")
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
-          trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis)
+          trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis,dendrogram="both")
 ```
 
 ```{r,fig.width=6, fig.height=6}
@@ -385,15 +386,23 @@ cl_DEG <- cutree(hcl_DEG, k = 2)
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col = viridis,
           ColSideColors = rainbow(2)[cl_DEG])
+```
 
+```{r,fig.width=6, fig.height=6}
 #Boxplot for each gene
 expr_DEG_list <- tapply(names(cl_DEG), cl_DEG, function(x) expr[x,])
 scaled_expr_DEG_list <- lapply(expr_DEG_list, function(x) t(scale(t(x))))
+
+jpeg(file="heatmap_clusters.jpg")
+par(mfrow=2:1)
+plot(1:5,5:1)
+plot(1:5,5:1)
 for(cluster in unique(cl_DEG[hcl_DEG$order]))
   boxplot(scaled_expr_DEG_list[[cluster]], las = 2,
           main = paste0("Cluster ",cluster, " (", nrow(scaled_expr_DEG_list[[cluster]]), ")"),
           names=meta$disease_state)
 ```
+
 
 ```{r}
 #WGCNA / coexpression analysis
