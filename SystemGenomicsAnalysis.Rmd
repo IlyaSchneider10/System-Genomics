@@ -147,7 +147,8 @@ for (p1 in seq(pcas_considered)){
     print(ggplot(data.frame(pca$x, meta)) +
     geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1))
-    +ylab(paste0("PC",p1+1)))
+    +ylab(paste0("PC",p1+1))
+    + theme_minimal())
     
   }
   
@@ -156,7 +157,8 @@ for (p1 in seq(pcas_considered)){
     print(ggplot(data.frame(pca$x, meta)) +
     geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1-2))
-    +ylab(paste0("PC",p1)))
+    +ylab(paste0("PC",p1))
+    + theme_minimal())
     
   }
     
