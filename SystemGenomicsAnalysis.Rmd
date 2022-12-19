@@ -596,7 +596,7 @@ write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_Control_l
 
 ## Enrichment analysis : rank distribution analysis
 
-```{r, eval=FALSE}
+```{r}
 ##optional: Enrichment analysis : rank distribution analysis
 scores <- setNames(sign(log(all_DEG2$fc)) * (-log10(all_DEG2$pval)),
                    setNames(meta_genes$ensembl_gene_id,
@@ -615,8 +615,8 @@ maxSize  = 500)
 fgsea_kegg[order(NES,decreasing=T),][1:10,1:7]
 
 ##possible plots for GSEA results of one subset
-plotEnrichment(genesets_celltype_list[["GOBP_ION_TRANSPORT"]],
-               scores_ordered) + labs(title="GOBP_ION_TRANSPORT")
+plotEnrichment(genesets_celltype_list[["GOCC_VESICLE_MEMBRANE"]],
+               scores_ordered) + labs(title="GOCC_VESICLE_MEMBRANE")
 
 #filter out GO we have similar with paper
 fgsea_kegg %>% filter( grepl('REGULATION_OF_CELLULAR|ION_TRANS|HOMEO|CELL_DEATH|VESICLE|CELLULAR_BIO|NERVOUS', pathway)) %>% arrange(desc(NES)) -> GO_paper
