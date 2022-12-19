@@ -148,7 +148,6 @@ for (p1 in seq(pcas_considered)){
     geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1))
     +ylab(paste0("PC",p1+1))+theme_minimal())
-    
   }
   
   else{
@@ -400,7 +399,7 @@ plot(as.dendrogram(hcl_DEG, labels = FALSE))
 
 ``` 
 
-```{r,fig.width=6, fig.height=6}
+```{r,eval=FALSE,fig.width=6, fig.height=6}
 jpeg(file="heatmap.jpg")
 heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG),
           trace = "none", scale = "none", labRow = NA, labCol = NA, col=viridis,dendrogram="both")
@@ -414,11 +413,13 @@ heatmap.2(corr_DEG, Rowv = as.dendrogram(hcl_DEG), Colv = as.dendrogram(hcl_DEG)
           ColSideColors = rainbow(2)[cl_DEG])
 ```
 
-```{r,fig.width=6, fig.height=6}
+```{r}
 #Boxplot for each gene
 expr_DEG_list <- tapply(names(cl_DEG), cl_DEG, function(x) expr[x,])
 scaled_expr_DEG_list <- lapply(expr_DEG_list, function(x) t(scale(t(x))))
+```
 
+```{r,eval=FALSE,fig.width=6, fig.height=6}
 jpeg(file="heatmap_clusters.jpg")
 par(mfrow=2:1)
 plot(1:5,5:1)
@@ -507,9 +508,9 @@ wgcna_check_threshold(expr_DEG_cluster_2) #we pick threshold 22 from the graph
 moduleColors_expr_DEG_cluster_2<-wgcna_split_into_modules(expr_DEG_cluster_2,22)
 ```
 
-```{r}
+```{r,fig.width=14, fig.height=7}
 #Feed all DEG from all the patients at once
-wgcna_check_threshold(t(expr[all_DEG2$gene,])) #we pick threshold 18 from the graph
+#wgcna_check_threshold(t(expr[all_DEG2$gene,])) #we pick threshold 18 from the graph
 moduleColors_expr_ALL<-wgcna_split_into_modules(t(expr[all_DEG2$gene,]),18)
 ```
 
@@ -547,7 +548,7 @@ plot_module_heatmaps(modules_Control_list)
 ```
 
 ```{r,fig.width=6, fig.height=6}
-#Plot cluster one modules
+#Plot cluster two modules
 
 modules_Cluster_One_list=split(names(moduleColors_expr_DEG_cluster_1),moduleColors_expr_DEG_cluster_1)
 
@@ -578,22 +579,27 @@ all_cluster_modules<-append(modules_Cluster_One_list,modules_Cluster_Two_list) #
 
 plot_boxplots_modules<- function(module_list){
   
-  for (module in 1:length(module_list)){
+  for (module in 2:length(module_list)){
   expr_modules<-expr[module_list[[module]],]
   scaled_expr_modules<-t(scale(t(expr_modules)))
   
   boxplot(scaled_expr_modules, las = 2,
-          main = paste0("Cluster ",module),
+          main = paste0("Module ",names(module_list)[module]," (",length(module_list[[module]]),")"),
           names=paste0(meta$disease_state))
 }
 }
 
 plot_boxplots_modules(all_patient_modules)
 plot_boxplots_modules(all_cluster_modules)
-
 plot_boxplots_modules(modules_Cluster_ALL_list)
-
 ```
+
+```{r,eval=FALSE,fig.width=32, fig.height=20}
+jpeg("try.jpg")
+par(mfrow=c(2,2))
+plot_boxplots_modules(modules_Cluster_ALL_list)
+```
+
 
 # 3.6 DAVID
 
@@ -661,6 +667,7 @@ fgsea_kegg %>% filter( grepl('REGULATION_OF_CELLULAR|ION_TRANS|HOMEO|CELL_DEATH|
 
 #filter for name, padj, NES, size
 write.csv(GO_paper[,c(1,3,6,7)], here("GO_paper.csv"), row.names=FALSE)
+
 
 ```
 
