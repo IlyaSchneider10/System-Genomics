@@ -30,6 +30,7 @@ library(WGCNA)
 library(plotly)
 library(fgsea)
 library(msigdbr)
+library(xtable)
 ```
 
 # 3_2 Import data to R
@@ -148,7 +149,7 @@ for (p1 in seq(pcas_considered)){
     geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1))
     +ylab(paste0("PC",p1+1))+theme_minimal())
-  }
+ }
   
   else{
     
@@ -156,7 +157,6 @@ for (p1 in seq(pcas_considered)){
     geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1-2))
     +ylab(paste0("PC",p1))+theme_minimal())
-    
   }
     
 }
@@ -669,6 +669,12 @@ fgsea_kegg %>% filter( grepl('REGULATION_OF_CELLULAR|ION_TRANS|HOMEO|CELL_DEATH|
 write.csv(GO_paper[,c(1,3,6,7)], here("GO_paper.csv"), row.names=FALSE)
 
 
+```
+
+```{r, results='asis', echo=FALSE, fig.pos="H"}
+#print Latex table of GO for presentation
+
+print(xtable(GO_paper[,c(1,3,6,7)]), comment=FALSE)
 ```
 
 
