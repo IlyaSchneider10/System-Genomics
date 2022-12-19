@@ -149,13 +149,15 @@ for (p1 in seq(pcas_considered)){
     geom_point(aes(x = pca$x[,paste0("PC",p1)], y = pca$x[,paste0("PC",p1+1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1))
     +ylab(paste0("PC",p1+1))+theme_minimal())
- }
+    
+  }
   
   else{
     
     print(ggplot(data.frame(pca$x, meta)) +
     geom_point(aes(x = pca$x[,paste0("PC",p1-2)], y = pca$x[,paste0("PC",p1)], color = disease_state), size = 5)
     +xlab(paste0("PC",p1-2))
+
     +ylab(paste0("PC",p1))+theme_minimal())
   }
     
@@ -163,23 +165,8 @@ for (p1 in seq(pcas_considered)){
 
 #3D plot with first three PC
 #PCA_3D <- 
-plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 40)%>%
- layout(scene = list(xaxis = list(title = 'PC1'),
-                    yaxis = list(title = 'PC2'),
-                    zaxis = list(title = 'PC3')))
-
-htmlwidgets::saveWidget(as_widget(plot), "PCA_3D.html")
-library(animation)
-
-# Use the saveGIF function from the animation package to create a rotating GIF of the plot
-'saveGIF({
-  for (i in 1:360) {
-    plot %>% layout(scene = list(camera = list(up = list(x = 0, y = 0, z = 1),
-                                         center = list(x = 0, y = 0, z = 0),
-                                         eye = list(x = cos(pi*i/180), y = sin(pi*i/180), z = 0.5))))
-    Sys.sleep(0.1)
-  }
-},  movie.name="PCA.gif", fps=5/720L)'
+  plot_ly(data.frame(pca$x, meta), x = ~pca$x[, "PC1"], y = ~pca$x[,"PC2"], z = ~pca$x[,"PC3"], color = meta$disease_state, colors=c( "brown3", "turquoise2")) %>%add_markers(size = 12)
+#htmlwidgets::saveWidget(as_widget(PCA_3D), "PCA_3D.html")
 
 ```
 
@@ -286,22 +273,11 @@ res_DE <- res_DE %>%
   mutate(DEG = ifelse(DE, meta_genes$hgnc_symbol, NA))
 ggplot(res_DE, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
   geom_point() +
-  geom_text_repel(show.legend = FALSE) +
-  geom_vline(xintercept=c(log2(2), 0), col="#303030", linetype="dotted") +
+  geom_text_repel() +
+  geom_vline(xintercept=c(log(2), 0), col="#303030", linetype="dotted") +
   geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
   scale_color_manual(values=c("#909090", "red")) +
-  theme_minimal() +
-  xlab("Fold Change (log base 2)")+
-  ylab("Meta p-value (-log base 10)")
-
- geom_point(alpha=0.4) +
-  geom_text_repel(max.overlaps = 60, show.legend = FALSE ) + # do not understand why labels on the left side dont appear, think if we want lables at all here
-  geom_vline(xintercept=c(log2(2), -log2(2)), col="#303030", linetype="dotted") +
-  geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
-  scale_color_manual(values=c("#909090", "red")) +
-  theme_minimal() +
-  xlab("Fold Change (log base 2)")+
-  ylab("Meta p-value (-log base 10)")
+  theme_minimal()
 ```
 
 ```{r}
@@ -339,10 +315,10 @@ cor(res_DESeq2$padj,
 layout(matrix(1:2, nrow=1))
 plot(-log10(res_DESeq2$pvalue),
      -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
-     xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16, ylim=c(0,10))
+     xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
 smoothScatter(-log10(res_DESeq2$pvalue),
               -log10(res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(pval)),
-              xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16, ylim=c(0,10))
+              xlab = "-log10(pval DESeq2)", ylab = "-log10(pval DE)", pch=16)
 
 table(p.adjust(res_DESeq2$pvalue, method="BH") < 0.1,
       res_DE %>% filter(gene %in% rownames(res_DESeq2)) %>% pull(padj) < 0.1)
@@ -514,7 +490,6 @@ moduleColors_expr_DEG_cluster_2<-wgcna_split_into_modules(expr_DEG_cluster_2,22)
 moduleColors_expr_ALL<-wgcna_split_into_modules(t(expr[all_DEG2$gene,]),18)
 ```
 
-
 ```{r}
 #Create module heatmaps function
 
@@ -574,9 +549,6 @@ plot_module_heatmaps(modules_Cluster_ALL_list)
 ```{r}
 #boxplots for different modules
 
-all_patient_modules<-append(modules_BD_list,modules_Control_list) #1-7 BD specific WGCNA clusters, 8-12 control specific WGCNA clusters
-all_cluster_modules<-append(modules_Cluster_One_list,modules_Cluster_Two_list) # 1,2 healthy upregulated; 3,4,5 BD upregulated; 
-
 plot_boxplots_modules<- function(module_list){
   
   for (module in 2:length(module_list)){
@@ -588,18 +560,27 @@ plot_boxplots_modules<- function(module_list){
           names=paste0(meta$disease_state))
 }
 }
-
-plot_boxplots_modules(all_patient_modules)
-plot_boxplots_modules(all_cluster_modules)
-plot_boxplots_modules(modules_Cluster_ALL_list)
 ```
 
-```{r,eval=FALSE,fig.width=32, fig.height=20}
-jpeg("try.jpg")
+```{r,fig.width=32, fig.height=20}
 par(mfrow=c(2,2))
 plot_boxplots_modules(modules_Cluster_ALL_list)
 ```
 
+```{r}
+
+all_patient_modules<-append(modules_BD_list,modules_Control_list) #1-7 BD specific WGCNA clusters, 8-12 control specific WGCNA clusters
+all_cluster_modules<-append(modules_Cluster_One_list,modules_Cluster_Two_list) # 1,2 healthy upregulated; 3,4,5 BD upregulated;
+
+plot_boxplots_modules(all_patient_modules)
+plot_boxplots_modules(all_cluster_modules)
+```
+
+```{}
+layout(matrix(c(1,2,1,3), 2, 2, byrow = TRUE))
+plot_boxplots_modules(modules_Cluster_One_list)
+plot_boxplots_modules(modules_Cluster_Two_list)
+```
 
 # 3.6 DAVID
 
@@ -639,7 +620,6 @@ write.table(meta_genes[meta_genes$ensembl_gene_id_version %in% modules_Control_l
 
 ## Enrichment analysis : rank distribution analysis
 
-
 ```{r}
 ##optional: Enrichment analysis : rank distribution analysis
 scores <- setNames(sign(log(all_DEG2$fc)) * (-log10(all_DEG2$pval)),
@@ -665,10 +645,7 @@ plotEnrichment(genesets_celltype_list[["GOCC_VESICLE_MEMBRANE"]],
 #filter out GO we have similar with paper
 fgsea_kegg %>% filter( grepl('REGULATION_OF_CELLULAR|ION_TRANS|HOMEO|CELL_DEATH|VESICLE|CELLULAR_BIO|NERVOUS', pathway)) %>% arrange(desc(NES)) -> GO_paper
 
-#filter for name, padj, NES, size
-write.csv(GO_paper[,c(1,3,6,7)], here("GO_paper.csv"), row.names=FALSE)
-
-
+write.csv(GO_paper[,1:7], here("GO_paper.csv"), row.names=FALSE)
 ```
 
 ```{r, results='asis', echo=FALSE, fig.pos="H"}
