@@ -347,13 +347,15 @@ test_DESeq2_df_new<-test_DESeq2_df_new[-which(test_DESeq2_df_new$DEG==""),]
 #save all DEGs in df
 all_DEG2 <- test_DESeq2_df_new[!is.na(test_DESeq2_df_new$DEG),]
 
-ggplot(test_DESeq2_df_new, aes(x = log(fc), y = -log10(padj), col=DE, label=DEG)) +
+ggplot(test_DESeq2_df_new, aes(x = log2(fc), y = -log10(padj), col=DE, label=DEG)) +
   geom_point(alpha=0.4) +
-  geom_text_repel(max.overlaps = 55) + # do not understand why labels on the left side dont appear, think if we want lables at all here
-  geom_vline(xintercept=c(log(2), -log(2)), col="#303030", linetype="dotted") +
+  geom_text_repel(max.overlaps = 60, show.legend = FALSE ) + # do not understand why labels on the left side dont appear, think if we want lables at all here
+  geom_vline(xintercept=c(log2(2), -log2(2)), col="#303030", linetype="dotted") +
   geom_hline(yintercept=-log10(0.1), col="#303030", linetype="dotted") +
   scale_color_manual(values=c("#909090", "red")) +
-  theme_minimal()
+  theme_minimal() +
+  xlab("Fold Change (log base 2)")+
+  ylab("Meta p-value (-log base 10)")
 
 #What is this table?
 
