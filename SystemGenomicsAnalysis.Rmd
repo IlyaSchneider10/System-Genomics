@@ -102,7 +102,8 @@ ggplot(data.frame(avg_expr), aes(x=avg_expr)) +
 
 #how many samples each gene detected
 num_det <- rowSums(expr > 0)
-hist(num_det)
+hist(num_det,xlab="Number of patients", main = "Gene occurence in patients")
+abline(v=6,col="red")
 ```
 
 ```{r}
@@ -119,16 +120,15 @@ hcl_pearson <- hclust(as.dist(1 - corr_pearson))
 hcl_spearman <- hclust(as.dist(1 - corr_spearman))
 
 layout(matrix(1:2,nrow=1))
-plot(hcl_pearson)
-plot(hcl_spearman)
+plot(hcl_spearman, labels = meta$disease_state, main="Spearman correlation dendrogram")
+plot(hcl_pearson, labels = meta$disease_state, main="Pearson correlation dendrogram") 
 
 #Example of plotting with different labels in spearman case
 layout(matrix(1:2,nrow=1))
 plot(hcl_spearman, labels = meta$Individual)
 plot(hcl_spearman, labels = meta$Sex) #maybe choose other variable (disease_state?)
-plot(hcl_spearman, labels = meta$disease_state)
+plot(hcl_spearman, labels = meta$disease_state, main="Spearman correlation dendrogram")
 ```
-
 
 ```{r}
 #Dimension reduced with PCA
