@@ -95,10 +95,15 @@ hist(log10(avg_expr + 1))
 
 #log tranform y-axis
 ggplot(data.frame(avg_expr), aes(x=avg_expr)) +
-  geom_histogram(bins = 50) +
+  geom_histogram(bins = 50, color="black", fill="lightgrey") +
   scale_x_continuous(breaks = c(0,1,10,100,1000,10000,20000), trans="log1p", expand=c(0,0)) +
-  scale_y_continuous(breaks = c(0,1), expand=c(0,0), trans="log1p") +
-  theme_minimal()
+  scale_y_continuous(breaks = c(0,1, 10, 100, 1000, 10000, 20000), expand=c(0,0), trans="log1p") +
+  xlab("Average expression level per gene")+
+  ylab("Number of genes")+
+  theme_minimal() +
+  labs(title="Log-log transformed Histogram of average expression level per gene")+
+  theme(plot.title = element_text(face="bold"))
+
 
 #how many samples each gene detected
 num_det <- rowSums(expr > 0)
@@ -127,6 +132,7 @@ layout(matrix(1:2,nrow=1))
 plot(hcl_spearman, labels = meta$Individual)
 plot(hcl_spearman, labels = meta$Sex) #maybe choose other variable (disease_state?)
 plot(hcl_spearman, labels = meta$disease_state)
+
 ```
 
 
